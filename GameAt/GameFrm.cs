@@ -59,6 +59,8 @@ namespace GameAt
         };
 
         public eCELL_STT[,] m_anbCellStt;
+        public eCELL_STT m_nbPlyr;
+        public List<sPLAY_HIS> m_nbPlayHis;
         Random m_sRand;
         const int DIR_LMT = 8;
         int[,] m_aidDirOfs;
@@ -105,6 +107,20 @@ namespace GameAt
             SimGame(ref asTrnData1);
         }
 
+        private void button3_Click(object sender, EventArgs e)
+        {
+            InitBoard();
+            UpdBoardDsp();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (SimTurn())
+            {
+                // 終了
+            }
+        }
+
         public void InitBoard()
         {
             int idRow1;
@@ -121,31 +137,23 @@ namespace GameAt
             m_anbCellStt[1 + Define.BOARD_ROW / 2, 1 + Define.BOARD_COL / 2] = eCELL_STT.BLACK;
             m_anbCellStt[1 + Define.BOARD_ROW / 2 - 1, 1 + Define.BOARD_COL / 2] = eCELL_STT.WHITE;
             m_anbCellStt[1 + Define.BOARD_ROW / 2, 1 + Define.BOARD_COL / 2 - 1] = eCELL_STT.WHITE;
+
+            m_nbPlyr = eCELL_STT.BLACK;
+            m_nbPlayHis = new List<sPLAY_HIS>();
         }
 
         public void SimGame(ref List<sTRN_DATA> asTrnData1)
         {
-            List<sPLAY_HIS> anbPlayHis1 = new List<sPLAY_HIS>();
-
             InitBoard();
 
             UpdBoardDsp();
             // 黒から始まり
-            eCELL_STT nbPlyr1 = eCELL_STT.BLACK;
             while (true)
             {
-                if (!PlayGame(nbPlyr1, ref anbPlayHis1))
+                if (SimTurn())
                 {
-                    // おけない場合交代
-                    nbPlyr1 = GetOptPlyr(nbPlyr1);
-                    if (!PlayGame(nbPlyr1, ref anbPlayHis1))
-                    {
-                        // 両方おけない場合終了
-                        break;
-                    }
+                    break;
                 }
-
-                nbPlyr1 = GetOptPlyr(nbPlyr1);
             }
 
             eCELL_STT nbWinPlyr1 = GetWinPlyr();
@@ -156,20 +164,37 @@ namespace GameAt
             }
             else
             {
-                RgsTrnData(ref asTrnData1, nbWinPlyr1, anbPlayHis1);
+                RgsTrnData(ref asTrnData1, nbWinPlyr1);
             }
         }
 
-        public void RgsTrnData(ref List<sTRN_DATA> asTrnData1, eCELL_STT nbWinPlyr1, List<sPLAY_HIS> anbPlayHis1)
+        public bool SimTurn()
+        {
+            if (!PlayGame(m_nbPlyr))
+            {
+                // おけない場合交代
+                m_nbPlyr = GetOptPlyr(m_nbPlyr);
+                if (!PlayGame(m_nbPlyr))
+                {
+                    // 両方おけない場合終了
+                    return (true);
+                }
+            }
+
+            m_nbPlyr = GetOptPlyr(m_nbPlyr);
+            return (false);
+        }
+
+        public void RgsTrnData(ref List<sTRN_DATA> asTrnData1, eCELL_STT nbWinPlyr1)
         {
             InitBoard();
 
             int idHis1;
-            for(idHis1 = 0; idHis1 < anbPlayHis1.Count; idHis1++)
+            for(idHis1 = 0; idHis1 < m_nbPlayHis.Count; idHis1++)
             {
-                PutCell(anbPlayHis1[idHis1].m_nbPlyr, anbPlayHis1[idHis1].m_idRow, anbPlayHis1[idHis1].m_idCol);
+                PutCell(m_nbPlayHis[idHis1].m_nbPlyr, m_nbPlayHis[idHis1].m_idRow, m_nbPlayHis[idHis1].m_idCol);
 
-                asTrnData1.Add(GetTrnData(anbPlayHis1[idHis1].m_nbPlyr, nbWinPlyr1));
+                asTrnData1.Add(GetTrnData(m_nbPlayHis[idHis1].m_nbPlyr, nbWinPlyr1));
             }
         }
 
@@ -228,7 +253,7 @@ namespace GameAt
             return (ctCell1);
         }
 
-        public bool PlayGame(eCELL_STT nbStt1, ref List<sPLAY_HIS> anbPlayHis1)
+        public bool PlayGame(eCELL_STT nbStt1)
         {
             List<sCELL_POS> asCellPos1 = GetOkCell(nbStt1);
 
@@ -242,7 +267,7 @@ namespace GameAt
             PutCell(nbStt1, sCellPos1.m_idRow, sCellPos1.m_idCol);
 
             // 履歴を更新
-            anbPlayHis1.Add(new sPLAY_HIS(nbStt1, sCellPos1.m_idRow, sCellPos1.m_idCol));
+            m_nbPlayHis.Add(new sPLAY_HIS(nbStt1, sCellPos1.m_idRow, sCellPos1.m_idCol));
 
             UpdBoardDsp();
           
@@ -402,5 +427,7 @@ namespace GameAt
             }
 
         }
+
+
     }
 }
