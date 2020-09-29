@@ -13,5 +13,7 @@ namespace GameAt
         public const int BOARD_COL = BOARD_ROW;
         public const int CELL_HEIGHT = 20;
         public const int CELL_WIDHT = CELL_HEIGHT;
+        public const int SIM_NUM = 100;
+        public const string TRN_DATA_FILE = @"TrnData.csv";
     }
 }

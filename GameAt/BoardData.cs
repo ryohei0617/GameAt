@@ -7,15 +7,20 @@ using Microsoft.ML.Data;
 
 namespace GameAt
 {
-    class BoardData
+    public class BoardData
     {
         // 盤面の点数
         [LoadColumn(0)]
-        public float dtScr { get; set; }
+        public float m_dtScr { get; set; }
 
         // 盤面の状態
         [LoadColumn(1, Define.BOARD_ROW * Define.BOARD_COL)]
         [VectorType(Define.BOARD_ROW * Define.BOARD_COL)]
-        public int[] m_adtStt { get; set; }
+        public float[] m_adtStt { get; set; }
+
+        public BoardData()
+        {
+            m_adtStt = new float[Define.BOARD_ROW * Define.BOARD_COL];
+        }
     }
 }

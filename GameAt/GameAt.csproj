@@ -103,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BoardData.cs" />
+    <Compile Include="BoardDataPrediction.cs" />
     <Compile Include="Define.cs" />
     <Compile Include="GameFrm.cs">
       <SubType>Form</SubType>
